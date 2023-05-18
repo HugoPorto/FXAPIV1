@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
+using FXAPIV1.Endpoints.Products;
+using FXAPIV1.Endpoints.Clients;
+using FXAPIV1.Domain.Users;
 
 namespace FXAPIV1;
 
@@ -67,6 +70,7 @@ public class Program
         });
 
         builder.Services.AddScoped<QueryAllUsersWithClaimName>();
+        builder.Services.AddScoped<UserCreator>();
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -110,7 +114,19 @@ public class Program
 
         app.MapMethods(TokenPost.Template, TokenPost.Methods, TokenPost.Handle);
 
+        app.MapMethods(ProductPost.Template, ProductPost.Methods, ProductPost.Handle);
+
+        app.MapMethods(ProductGetAll.Template, ProductGetAll.Methods, ProductGetAll.Handle);
+
+        app.MapMethods(ProductGetShowcase.Template, ProductGetShowcase.Methods, ProductGetShowcase.Handle);
+
+        app.MapMethods(ClientPost.Template, ClientPost.Methods, ClientPost.Handle);
+
+        app.MapMethods(ClientGet.Template, ClientGet.Methods, ClientGet.Handle);
+
         app.UseExceptionHandler("/error");
+
+        //Captura os erros nas requisições.
         app.Map("/error", (HttpContext http) =>
         {
 
