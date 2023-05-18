@@ -8,9 +8,7 @@ public class Order : Entity
     public List<Product> Products { get; private set; }
     public decimal Total { get; private set; }
     public string DeliveryAddress { get; private set; }
-
     private Order() { }
-
     public Order(string clientId, string clientName, List<Product> products, string deliveryAddress)
     {
         ClientId = clientId;
