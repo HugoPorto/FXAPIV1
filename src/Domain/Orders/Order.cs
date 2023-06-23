@@ -20,6 +20,7 @@ public class Order : Entity
         EditedOn = DateTime.UtcNow;
 
         Total = 0;
+
         foreach (var item in Products)
         {
             Total += item.Price;

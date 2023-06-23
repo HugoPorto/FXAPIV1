@@ -12,6 +12,7 @@ public class ClientGet
     public static async Task<IResult> Action(HttpContext http)
     {
         var user = http.User;
+
         var result = new
         {
             Id = user.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value,

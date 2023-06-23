@@ -16,6 +16,7 @@ public class ClientPost
             new Claim("Cpf", clientRequest.Cpf),
             new Claim("Name", clientRequest.Name)
         };
+
         (IdentityResult identity, string userId) result = 
             await userCreator.Create(clientRequest.Email, clientRequest.Password, userClaims);
         

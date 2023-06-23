@@ -1,17 +1,9 @@
-using FXAPIV1.Endpoints.Categories;
-using FXAPIV1.Endpoints.Employees;
-using FXAPIV1.Endpoints.Security;
-using FXAPIV1.Infra.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using FXAPIV1.Endpoints.Products;
 using FXAPIV1.Endpoints.Clients;
+using FXAPIV1.Endpoints.Orders;
 using FXAPIV1.Domain.Users;
 
 namespace FXAPIV1;
@@ -35,10 +27,7 @@ public class Program
 
         builder.Services.AddAuthorization(options =>
         {
-            /* options.FallbackPolicy = new AuthorizationPolicyBuilder()
-               .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-               .RequireAuthenticatedUser()
-               .Build();*/
+            SwaggerActivate(options);
 
             options.AddPolicy("EmployeePolicy", p => p.RequireAuthenticatedUser().RequireClaim("EmployeeCode"));
 
@@ -70,23 +59,16 @@ public class Program
         });
 
         builder.Services.AddScoped<QueryAllUsersWithClaimName>();
+
+        builder.Services.AddScoped<QueryAllProductsSold>();
+
         builder.Services.AddScoped<UserCreator>();
 
         builder.Services.AddEndpointsApiExplorer();
+
         builder.Services.AddSwaggerGen();
 
-        //builder.WebHost.UseSerilog((context, configuration) =>
-        //{
-        //    configuration
-        //        .WriteTo.Console()
-        //        .WriteTo.MSSqlServer(
-        //            context.Configuration["ConnectionString:IWantDb"],
-        //              sinkOptions: new MSSqlServerSinkOptions()
-        //              {
-        //                  AutoCreateSqlTable = true,
-        //                  TableName = "LogAPI"
-        //              });
-        //});
+        //DbLogActivate(builder);
 
         var app = builder.Build();
         app.UseAuthentication();
@@ -124,9 +106,48 @@ public class Program
 
         app.MapMethods(ClientGet.Template, ClientGet.Methods, ClientGet.Handle);
 
+        app.MapMethods(OrderPost.Template, OrderPost.Methods, OrderPost.Handle);
+
+        app.MapMethods(OrderGet.Template, OrderGet.Methods, OrderGet.Handle);
+
+        app.MapMethods(ProductSoldGet.Template, ProductSoldGet.Methods, ProductSoldGet.Handle);
+
         app.UseExceptionHandler("/error");
 
-        //Captura os erros nas requisições.
+        validateErros(app);
+    }
+
+    [Obsolete]
+    private static void DbLogActivate(WebApplicationBuilder builder)
+    {
+        builder.WebHost.UseSerilog((context, configuration) =>
+        {
+            configuration
+                .WriteTo.Console()
+                .WriteTo.MSSqlServer(
+                    context.Configuration["ConnectionString:IWantDb"],
+                      sinkOptions: new MSSqlServerSinkOptions()
+                      {
+                          AutoCreateSqlTable = true,
+                          TableName = "LogAPI"
+                      });
+        });
+    }
+
+    private static void SwaggerActivate(AuthorizationOptions options)
+    {
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                       .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                       .RequireAuthenticatedUser()
+                       .Build();
+    }
+
+    /// <summary>
+    /// Captura os erros nas requisições.
+    /// </summary>
+    /// <param name="app">Instância da aplicação web.</param>
+    private static void validateErros(WebApplication app)
+    {
         app.Map("/error", (HttpContext http) =>
         {
 
