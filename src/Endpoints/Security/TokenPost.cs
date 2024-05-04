@@ -24,7 +24,6 @@ public class TokenPost
             Results.BadRequest();
 
         var key = Encoding.ASCII.GetBytes(configuration["JwtBearerTokenSettings:SecretKey"]);
-
         var claims = userManager.GetClaimsAsync(user!).Result;
 
         var subject = new ClaimsIdentity(new Claim[]
@@ -47,6 +46,7 @@ public class TokenPost
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
+
         return Results.Ok(new
         {
             token = tokenHandler.WriteToken(token)
