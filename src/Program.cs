@@ -31,8 +31,7 @@ public class Program
 
             options.AddPolicy("EmployeePolicy", p => p.RequireAuthenticatedUser().RequireClaim("EmployeeCode"));
 
-            options.AddPolicy("Employee005Policy", p =>
-                p.RequireAuthenticatedUser().RequireClaim("Employee005Policy", "005"));
+            options.AddPolicy("Employee005Policy", p => p.RequireAuthenticatedUser().RequireClaim("Employee005Policy", "005"));
 
             options.AddPolicy("CpfPolicy", p => p.RequireAuthenticatedUser().RequireClaim("Cpf"));
         });
@@ -141,11 +140,6 @@ public class Program
                        .RequireAuthenticatedUser()
                        .Build();
     }
-
-    /// <summary>
-    /// Captura os erros nas requisições.
-    /// </summary>
-    /// <param name="app">Instância da aplicação web.</param>
     private static void validateErros(WebApplication app)
     {
         app.Map("/error", (HttpContext http) =>

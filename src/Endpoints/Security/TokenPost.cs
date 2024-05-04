@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FXAPIV1.Endpoints.Security;
+﻿namespace FXAPIV1.Endpoints.Security;
 
 public class TokenPost
 {
@@ -10,9 +8,9 @@ public class TokenPost
 
     [AllowAnonymous]
     public static IResult Action(
-        LoginRequest loginRequest, 
-        IConfiguration configuration, 
-        UserManager<IdentityUser> userManager, 
+        LoginRequest loginRequest,
+        IConfiguration configuration,
+        UserManager<IdentityUser> userManager,
         ILogger<TokenPost> log, IWebHostEnvironment environment)
     {
         log.LogInformation("Getting token");
@@ -20,19 +18,19 @@ public class TokenPost
         var user = userManager.FindByEmailAsync(loginRequest.Email).Result;
 
         if (user == null)
-            Results.BadRequest();
+            return Results.BadRequest();
 
-        if (!userManager.CheckPasswordAsync(user, loginRequest.Password).Result)
+        if (!userManager.CheckPasswordAsync(user!, loginRequest.Password).Result)
             Results.BadRequest();
 
         var key = Encoding.ASCII.GetBytes(configuration["JwtBearerTokenSettings:SecretKey"]);
 
-        var claims = userManager.GetClaimsAsync(user).Result;
+        var claims = userManager.GetClaimsAsync(user!).Result;
 
         var subject = new ClaimsIdentity(new Claim[]
         {
             new Claim(ClaimTypes.Email, loginRequest.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user!.Id),
         });
 
         subject.AddClaims(claims);
