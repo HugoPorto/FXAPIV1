@@ -6,6 +6,7 @@ using FXAPIV1.Endpoints.Clients;
 using FXAPIV1.Endpoints.Orders;
 using FXAPIV1.Domain.Users;
 using FXAPIV1.Endpoints.Members;
+using FXAPIV1.Endpoints.Corn;
 
 namespace FXAPIV1;
 
@@ -107,6 +108,7 @@ public class Program
         app.MapMethods(ProductSoldGet.Template, ProductSoldGet.Methods, ProductSoldGet.Handle);
         app.MapMethods(MemberPost.Template, MemberPost.Methods, MemberPost.Handle);
         app.MapMethods(AdminRootPost.Template, AdminRootPost.Methods, AdminRootPost.Handle);
+        app.MapMethods(CornPost.Template, CornPost.Methods, CornPost.Handle);
         app.UseExceptionHandler("/error");
 
         validateErros(app);

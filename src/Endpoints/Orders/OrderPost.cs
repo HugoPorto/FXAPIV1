@@ -13,11 +13,9 @@ public class OrderPost
         HttpContext http,
         ApplicationDbContext context)
     {
-        var clientId = http.User.Claims
-            .First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var clientId = http.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-        var clientName = http.User.Claims
-            .First(c => c.Type == "Name").Value;
+        var clientName = http.User.Claims.First(c => c.Type == "Name").Value;
 
         List<Product> productsFound = null;
 
