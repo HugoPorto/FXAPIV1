@@ -5,6 +5,7 @@ using FXAPIV1.Endpoints.Products;
 using FXAPIV1.Endpoints.Clients;
 using FXAPIV1.Endpoints.Orders;
 using FXAPIV1.Domain.Users;
+using FXAPIV1.Endpoints.Members;
 
 namespace FXAPIV1;
 
@@ -29,9 +30,23 @@ public class Program
         {
             SwaggerActivate(options);
             options.AddPolicy("EmployeePolicy", p => p.RequireAuthenticatedUser().RequireClaim("EmployeeCode"));
-            options.AddPolicy("Employee005Policy", p => p.RequireAuthenticatedUser().RequireClaim("Employee005Policy", "005"));
+            options.AddPolicy("EmployeeAdminPolicy", p => p.RequireAuthenticatedUser().RequireClaim("EmployeePolicy", "05"));
+            options.AddPolicy("EmployeeAdminRootPolicy", p => p.RequireAuthenticatedUser().RequireClaim("EmployeePolicy", "10"));
             options.AddPolicy("CpfPolicy", p => p.RequireAuthenticatedUser().RequireClaim("Cpf"));
         });
+
+        var  MyAllowSpecificOrigins = "AllowMyOrigin";
+        
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: MyAllowSpecificOrigins,
+               builder => {
+                    builder.WithOrigins("http://localhost:8100")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+        });
+
 
         builder.Services.AddAuthentication(x =>
         {
@@ -64,7 +79,9 @@ public class Program
 
         var app = builder.Build();
         app.UseAuthentication();
+        app.UseCors(MyAllowSpecificOrigins);
         app.UseAuthorization();
+
 
         if (app.Environment.IsDevelopment())
         {
@@ -88,6 +105,8 @@ public class Program
         app.MapMethods(OrderPost.Template, OrderPost.Methods, OrderPost.Handle);
         app.MapMethods(OrderGet.Template, OrderGet.Methods, OrderGet.Handle);
         app.MapMethods(ProductSoldGet.Template, ProductSoldGet.Methods, ProductSoldGet.Handle);
+        app.MapMethods(MemberPost.Template, MemberPost.Methods, MemberPost.Handle);
+        app.MapMethods(AdminRootPost.Template, AdminRootPost.Methods, AdminRootPost.Handle);
         app.UseExceptionHandler("/error");
 
         validateErros(app);
